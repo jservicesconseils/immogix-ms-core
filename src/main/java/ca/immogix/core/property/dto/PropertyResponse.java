@@ -1,0 +1,55 @@
+package ca.immogix.core.property.dto;
+
+import ca.immogix.core.property.BuildingStatus;
+import ca.immogix.core.property.Property;
+import ca.immogix.core.property.PropertyStatus;
+import ca.immogix.core.property.PropertyType;
+
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.UUID;
+
+/** Ce que l'API renvoie au client apres creation (ou lecture) d'une propriete. */
+public record PropertyResponse(
+        UUID id,
+        UUID organizationId,
+        PropertyType type,
+        String name,
+        String street,
+        String city,
+        String province,
+        String postalCode,
+        PropertyStatus status,
+        String cadastreNumber,
+        String taxId,
+        BuildingStatus buildingStatus,
+        Integer yearBuilt,
+        Integer floorCount,
+        Double totalSurfaceArea,
+        BigDecimal estimatedValue,
+        String description,
+        Instant createdAt
+) {
+
+    public static PropertyResponse from(Property property) {
+        return new PropertyResponse(
+                property.getId(),
+                property.getOrganizationId(),
+                property.getType(),
+                property.getName(),
+                property.getStreet(),
+                property.getCity(),
+                property.getProvince(),
+                property.getPostalCode(),
+                property.getStatus(),
+                property.getCadastreNumber(),
+                property.getTaxId(),
+                property.getBuildingStatus(),
+                property.getYearBuilt(),
+                property.getFloorCount(),
+                property.getTotalSurfaceArea(),
+                property.getEstimatedValue(),
+                property.getDescription(),
+                property.getCreatedAt());
+    }
+}

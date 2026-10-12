@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: immotran-ms-core
+    name: immogix-ms-core
 
   # Base de donnees H2 en memoire : elle existe seulement pendant que
   # l'application tourne, et repart a zero a chaque redemarrage. Ideal
@@ -35,16 +35,16 @@ spring:
     console:
       enabled: true
 
-# Coordonnees du MEME User Pool Cognito qu'immotran-ms-identity : ce
+# Coordonnees du MEME User Pool Cognito qu'immogix-ms-identity : ce
 # service verifie les jetons independamment, sans jamais appeler
-# immotran-ms-identity par le reseau (chaque microservice fait confiance
+# immogix-ms-identity par le reseau (chaque microservice fait confiance
 # au claim tenant_id du jeton, voir TenantClaims).
-immotran:
+immogix:
   cognito:
     region: ${COGNITO_REGION:ca-central-1}
     user-pool-id: ${COGNITO_USER_POOL_ID:REPLACE_ME_ONCE_POOL_EXISTS}
   # Utilise uniquement si --spring.profiles.active=local (voir SecurityConfig.localJwtDecoder).
-  # Doit etre IDENTIQUE a environment.mockAuthSharedSecret dans immotran-ui-ng.
+  # Doit etre IDENTIQUE a environment.mockAuthSharedSecret dans immogix-ui-ng.
   local-auth:
     shared-secret: ${LOCAL_AUTH_SHARED_SECRET:local-dev-only-shared-secret-please-change-0123456789}
 

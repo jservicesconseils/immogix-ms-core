@@ -1,9 +1,9 @@
-immotran-ms-core — service coeur de la gestion immobilière
+immogix-ms-core — service coeur de la gestion immobilière
 
 Rôle dans l'architecture
 C'est le service métier principal : il gère les propriétés (maisons, condos, duplex/triplex/quadruplex, immeubles multi-unités), leurs unités, et plus tard les propriétaires, locataires, baux, loyers/dépenses, maintenance, documents, dashboard et règles administratives. C'est un monolithe modulaire volontaire (un seul déploiement, plusieurs packages Java par domaine) — voir la discussion d'architecture : on ne découpe en microservices séparés que lorsqu'une vraie frontière (scaling, équipe, SLA) l'exige.
 
-Ce service ne fait AUCUN appel réseau vers immotran-ms-identity. Il valide lui-même les jetons JWT émis par le même User Pool Cognito, et lit directement le claim tenant_id/tenant_scope (classe TenantClaims, copie volontairement identique à celle d'immotran-ms-identity). Chaque route qui touche une ressource appartenant à une organisation vérifie que le tenant de l'appelant la couvre.
+Ce service ne fait AUCUN appel réseau vers immogix-ms-identity. Il valide lui-même les jetons JWT émis par le même User Pool Cognito, et lit directement le claim tenant_id/tenant_scope (classe TenantClaims, copie volontairement identique à celle d'immogix-ms-identity). Chaque route qui touche une ressource appartenant à une organisation vérifie que le tenant de l'appelant la couvre.
 
 Modèle de données (cahier des charges, §14)
 Property 1→N Unit : une maison individuelle est une Property avec UNE SEULE Unit "principale" (principal=true) ; un immeuble est une Property avec N Unit indépendantes. Ce modèle uniforme évite de devoir créer artificiellement plusieurs unités pour une maison, tout en gérant les immeubles multi-unités de la même façon — c'est un critère d'acceptation explicite du MVP (§22).
@@ -22,7 +22,7 @@ Implémenté
 - admin — JurisdictionRule (catalogue de règles provinciales, donnée de référence PARTAGÉE par toute la plateforme, pas de tenant_id) et AuditLog (entité + service `record()` prêts, mais pas encore câblés automatiquement dans les autres modules — voir le Javadoc d'AuditLog.java). Pas de RBAC : les roles ne sont pas encore modélisés dans le jeton, donc n'importe quel utilisateur authentifié peut créer une règle juridictionnelle pour l'instant.
 
 Tous les modules du MVP (§21, Phase 1 du cahier des charges) sont maintenant couverts par une tranche verticale fonctionnelle et testée. Les approfondissements naturels pour la suite (hors MVP initial) :
-- RBAC réel une fois les rôles modélisés côté immotran-ms-identity
+- RBAC réel une fois les rôles modélisés côté immogix-ms-identity
 - Câblage d'AuditLog dans les autres modules (probablement via un aspect Spring AOP plutôt qu'en modifiant chaque contrôleur)
 - Upload réel de documents vers S3 (URL présignée)
 - Catalogue de règles juridictionnelles réellement rempli par province (actuellement juste la structure de données)
@@ -61,4 +61,4 @@ GET /api/v1/admin/jurisdiction-rules/{id} et GET /api/v1/admin/jurisdiction-rule
 GET /api/v1/organizations/{organizationId}/audit-logs — lister le journal d'audit d'une organisation
 
 Un point de sécurité important
-Contrairement à Organization dans immotran-ms-identity (où l'id de la ressource EST le tenant_id), ici l'id d'une propriété et son organizationId sont deux champs distincts : il faut donc toujours charger la ressource (404 si absente) avant de pouvoir vérifier l'accès au tenant (403 sinon). C'est un compromis assumé — voir les commentaires dans PropertyController.
+Contrairement à Organization dans immogix-ms-identity (où l'id de la ressource EST le tenant_id), ici l'id d'une propriété et son organizationId sont deux champs distincts : il faut donc toujours charger la ressource (404 si absente) avant de pouvoir vérifier l'accès au tenant (403 sinon). C'est un compromis assumé — voir les commentaires dans PropertyController.

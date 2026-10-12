@@ -1,0 +1,102 @@
+package ca.immogix.core.security;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
+/**
+ * Securise l'API avec des jetons JWT emis par le MEME User Pool Cognito
+ * qu'immogix-ms-identity.
+ *
+ * Regles :
+ *  - /actuator/health et /actuator/info restent ouverts (sondes de sante,
+ *    load balancer -- ils ne doivent jamais dependre d'un jeton)
+ *  - tout le reste exige un jeton valide : en-tete "Authorization: Bearer <jwt>"
+ *
+ * Ce service ne fait AUCUN appel reseau vers immogix-ms-identity : il
+ * verifie lui-meme la signature du jeton via les cles publiques (JWKS)
+ * de Cognito, puis lit directement le claim tenant_id/tenant_scope
+ * (voir TenantClaims). C'est le principe decrit dans le README
+ * d'immogix-ms-identity : chaque microservice fait confiance au tenant_id
+ * du jeton, sans jamais reimplementer la logique des roles.
+ *
+ * Profil "local" (voir localJwtDecoder ci-dessous) : meme bascule que
+ * dans immogix-ms-identity -- obligatoire de lancer les DEUX services
+ * avec --spring.profiles.active=local pour que le frontend puisse
+ * s'authentifier avant qu'un vrai User Pool Cognito existe.
+ */
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                        // Soumission d'une candidature de location : le candidat n'est
+                        // pas authentifie (voir ApplicationController). Seul le POST de
+                        // creation est public ; lecture/evaluation/decision restent
+                        // reservees au personnel authentifie.
+                        .requestMatchers(HttpMethod.POST, "/api/v1/properties/*/units/*/applications").permitAll()
+                        // Suivi de candidature par le candidat lui-meme (espace
+                        // locataire) : accessible par le seul id, sans jeton, comme
+                        // un numero de suivi de colis (voir ApplicationPublicStatusController).
+                        .requestMatchers(HttpMethod.GET, "/api/v1/applications/*/status").permitAll()
+                        // Annonce d'une unite (voir PropertyController.getUnitListing) :
+                        // un candidat la consulte avant meme de postuler, sans jeton.
+                        .requestMatchers(HttpMethod.GET, "/api/v1/properties/*/units/*/listing").permitAll()
+                        .anyRequest().authenticated())
+                .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {}));
+
+        return http.build();
+    }
+
+    private CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    @Bean
+    @Profile("!local")
+    public JwtDecoder jwtDecoder(
+            @Value("${immogix.cognito.region}") String region,
+            @Value("${immogix.cognito.user-pool-id}") String userPoolId) {
+
+        String jwkSetUri = "https://cognito-idp.%s.amazonaws.com/%s/.well-known/jwks.json"
+                .formatted(region, userPoolId);
+
+        return NimbusJwtDecoder.withJwkSetUri(jwkSetUri).build();
+    }
+
+    @Bean
+    @Profile("local")
+    public JwtDecoder localJwtDecoder(@Value("${immogix.local-auth.shared-secret}") String sharedSecret) {
+        SecretKeySpec secretKey = new SecretKeySpec(sharedSecret.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
+        return NimbusJwtDecoder.withSecretKey(secretKey).macAlgorithm(MacAlgorithm.HS256).build();
+    }
+}

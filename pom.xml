@@ -11,11 +11,11 @@
     <relativePath/>
   </parent>
 
-  <groupId>ca.immotran</groupId>
-  <artifactId>immotran-ms-core</artifactId>
+  <groupId>ca.immogix</groupId>
+  <artifactId>immogix-ms-core</artifactId>
   <version>0.1.0</version>
-  <name>immotran-ms-core</name>
-  <description>Service coeur Immotran : proprietes et unites, puis plus tard proprietaires, locataires, baux, finance, maintenance, documents, dashboard et administration.</description>
+  <name>immogix-ms-core</name>
+  <description>Service coeur Immogix : proprietes et unites, puis plus tard proprietaires, locataires, baux, finance, maintenance, documents, dashboard et administration.</description>
 
   <properties>
     <java.version>21</java.version>
@@ -53,7 +53,7 @@
     </dependency>
 
     <!-- Securite : valide les jetons JWT emis par Amazon Cognito (le meme
-         User Pool qu'immotran-ms-identity, aucun appel reseau entre les
+         User Pool qu'immogix-ms-identity, aucun appel reseau entre les
          deux services, chacun verifie le jeton par lui-meme) -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
