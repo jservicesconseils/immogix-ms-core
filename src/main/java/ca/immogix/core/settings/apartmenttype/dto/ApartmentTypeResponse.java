@@ -1,0 +1,25 @@
+package ca.immogix.core.settings.apartmenttype.dto;
+
+import ca.immogix.core.settings.apartmenttype.ApartmentType;
+
+import java.time.Instant;
+import java.util.UUID;
+
+/** Ce que l'API renvoie au client apres creation (ou lecture) d'un type d'appartement. */
+public record ApartmentTypeResponse(
+        UUID id,
+        UUID organizationId,
+        String name,
+        String description,
+        Instant createdAt
+) {
+
+    public static ApartmentTypeResponse from(ApartmentType apartmentType) {
+        return new ApartmentTypeResponse(
+                apartmentType.getId(),
+                apartmentType.getOrganizationId(),
+                apartmentType.getName(),
+                apartmentType.getDescription(),
+                apartmentType.getCreatedAt());
+    }
+}
