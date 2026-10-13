@@ -18,18 +18,6 @@ import java.util.UUID;
 @Service
 public class PropertyTypeOptionService {
 
-    // Catalogue de depart insere pour une organisation qui n'a encore
-    // aucun type de propriete -- reprend les valeurs de l'ancien enum
-    // PropertyType pour que la migration soit transparente.
-    private static final List<String[]> DEFAULT_CATALOG = List.of(
-            new String[] {"Single-family home", "Maison individuelle"},
-            new String[] {"Condo", "Condo"},
-            new String[] {"Duplex", "Duplex"},
-            new String[] {"Triplex", "Triplex"},
-            new String[] {"Quadruplex", "Quadruplex"},
-            new String[] {"Multi-unit building", "Immeuble multi-unités"},
-            new String[] {"House with secondary suite", "Maison avec logement secondaire"});
-
     private final PropertyTypeOptionRepository propertyTypeOptionRepository;
     private final PropertyRepository propertyRepository;
 
@@ -40,7 +28,7 @@ public class PropertyTypeOptionService {
 
     public PropertyTypeOptionResponse create(CreatePropertyTypeOptionRequest request) {
         PropertyTypeOption saved = propertyTypeOptionRepository.save(
-                new PropertyTypeOption(request.organizationId(), request.nameEn(), request.nameFr(), request.description()));
+                new PropertyTypeOption(request.organizationId(), request.name(), request.description()));
         return PropertyTypeOptionResponse.from(saved);
     }
 
@@ -49,16 +37,14 @@ public class PropertyTypeOptionService {
     }
 
     public List<PropertyTypeOptionResponse> listByOrganization(UUID organizationId) {
-        List<PropertyTypeOption> existing = propertyTypeOptionRepository.findByOrganizationIdOrderByNameEnAsc(organizationId);
-        if (existing.isEmpty()) {
-            existing = seedDefaults(organizationId);
-        }
-        return existing.stream().map(PropertyTypeOptionResponse::from).toList();
+        return propertyTypeOptionRepository.findByOrganizationIdOrderByNameAsc(organizationId).stream()
+                .map(PropertyTypeOptionResponse::from)
+                .toList();
     }
 
     public PropertyTypeOptionResponse update(UUID id, UpdatePropertyTypeOptionRequest request) {
         PropertyTypeOption propertyTypeOption = getEntityById(id);
-        propertyTypeOption.update(request.nameEn(), request.nameFr(), request.description());
+        propertyTypeOption.update(request.name(), request.description());
         return PropertyTypeOptionResponse.from(propertyTypeOptionRepository.save(propertyTypeOption));
     }
 
@@ -72,12 +58,5 @@ public class PropertyTypeOptionService {
     public PropertyTypeOption getEntityById(UUID id) {
         return propertyTypeOptionRepository.findById(id)
                 .orElseThrow(() -> new SettingsItemNotFoundException("type de propriete", id));
-    }
-
-    private List<PropertyTypeOption> seedDefaults(UUID organizationId) {
-        List<PropertyTypeOption> seeded = DEFAULT_CATALOG.stream()
-                .map(pair -> new PropertyTypeOption(organizationId, pair[0], pair[1], null))
-                .toList();
-        return propertyTypeOptionRepository.saveAll(seeded);
     }
 }

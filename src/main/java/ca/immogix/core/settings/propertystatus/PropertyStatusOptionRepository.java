@@ -7,5 +7,5 @@ import java.util.UUID;
 
 public interface PropertyStatusOptionRepository extends JpaRepository<PropertyStatusOption, UUID> {
 
-    List<PropertyStatusOption> findByOrganizationIdOrderByNameEnAsc(UUID organizationId);
+    List<PropertyStatusOption> findByOrganizationIdOrderByNameAsc(UUID organizationId);
 }

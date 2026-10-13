@@ -49,11 +49,11 @@ class PropertyStatusOptionControllerTest {
     private JwtDecoder jwtDecoder;
 
     private static CreatePropertyStatusOptionRequest createRequest(UUID organizationId) {
-        return new CreatePropertyStatusOptionRequest(organizationId, "Active", "Actif", "Propriete geree activement", "success");
+        return new CreatePropertyStatusOptionRequest(organizationId, "Actif", "Propriete geree activement", "success");
     }
 
     private static PropertyStatusOptionResponse response(UUID id, UUID organizationId) {
-        return new PropertyStatusOptionResponse(id, organizationId, "Active", "Actif", "Propriete geree activement", "success", Instant.now());
+        return new PropertyStatusOptionResponse(id, organizationId, "Actif", "Propriete geree activement", "success", Instant.now());
     }
 
     @Test
@@ -68,7 +68,7 @@ class PropertyStatusOptionControllerTest {
                         .content(objectMapper.writeValueAsString(createRequest(organizationId))))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/v1/property-statuses/" + id))
-                .andExpect(jsonPath("$.nameFr").value("Actif"));
+                .andExpect(jsonPath("$.name").value("Actif"));
     }
 
     @Test
@@ -94,7 +94,7 @@ class PropertyStatusOptionControllerTest {
     @Test
     void creerUnStatutDePropriete_nomVide_renvoie400() throws Exception {
         UUID organizationId = UUID.randomUUID();
-        CreatePropertyStatusOptionRequest invalide = new CreatePropertyStatusOptionRequest(organizationId, "", "", null, "success");
+        CreatePropertyStatusOptionRequest invalide = new CreatePropertyStatusOptionRequest(organizationId, "", null, "success");
 
         mockMvc.perform(post("/api/v1/property-statuses")
                         .with(jwt().jwt(builder -> builder.claim("tenant_id", organizationId.toString())))
@@ -146,7 +146,7 @@ class PropertyStatusOptionControllerTest {
                         .param("organizationId", organizationId.toString())
                         .with(jwt().jwt(builder -> builder.claim("tenant_id", organizationId.toString()))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].nameFr").value("Actif"));
+                .andExpect(jsonPath("$[0].name").value("Actif"));
     }
 
     @Test
@@ -167,7 +167,7 @@ class PropertyStatusOptionControllerTest {
         when(propertyStatusOptionService.getById(id)).thenReturn(response(id, organizationId));
         when(propertyStatusOptionService.update(eq(id), any())).thenReturn(response(id, organizationId));
 
-        UpdatePropertyStatusOptionRequest request = new UpdatePropertyStatusOptionRequest("Sold", "Vendu", "Propriete vendue", "secondary");
+        UpdatePropertyStatusOptionRequest request = new UpdatePropertyStatusOptionRequest("Vendu", "Propriete vendue", "secondary");
 
         mockMvc.perform(put("/api/v1/property-statuses/{id}", id)
                         .with(jwt().jwt(builder -> builder.claim("tenant_id", organizationId.toString())))
@@ -184,7 +184,7 @@ class PropertyStatusOptionControllerTest {
         UUID id = UUID.randomUUID();
         when(propertyStatusOptionService.getById(id)).thenReturn(response(id, organizationId));
 
-        UpdatePropertyStatusOptionRequest request = new UpdatePropertyStatusOptionRequest("Sold", "Vendu", "Propriete vendue", "secondary");
+        UpdatePropertyStatusOptionRequest request = new UpdatePropertyStatusOptionRequest("Vendu", "Propriete vendue", "secondary");
 
         mockMvc.perform(put("/api/v1/property-statuses/{id}", id)
                         .with(jwt().jwt(builder -> builder.claim("tenant_id", autreTenant.toString())))

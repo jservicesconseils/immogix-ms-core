@@ -54,9 +54,9 @@ class LeaseControllerTest {
     private JwtDecoder jwtDecoder;
 
     private static PropertyResponse propertyResponse(UUID id, UUID organizationId) {
-        return new PropertyResponse(id, organizationId, new OptionRef(UUID.randomUUID(), "Single-family home", "Maison individuelle"), null,
+        return new PropertyResponse(id, organizationId, new OptionRef(UUID.randomUUID(), "Maison individuelle"), null,
                 "123 rue des Lilas", "Montreal", "QC", "H1A 1A1",
-                new PropertyStatusOptionResponse.PropertyStatusRef(UUID.randomUUID(), "Vacant", "Vacante", "warn"),
+                new PropertyStatusOptionResponse.PropertyStatusRef(UUID.randomUUID(), "Vacante", "warn"),
                 null, null, null, null, null, null, null, null, Instant.now());
     }
 

@@ -10,8 +10,7 @@ import java.util.UUID;
 public record PropertyTypeOptionResponse(
         UUID id,
         UUID organizationId,
-        String nameEn,
-        String nameFr,
+        String name,
         String description,
         Instant createdAt
 ) {
@@ -20,14 +19,13 @@ public record PropertyTypeOptionResponse(
         return new PropertyTypeOptionResponse(
                 propertyTypeOption.getId(),
                 propertyTypeOption.getOrganizationId(),
-                propertyTypeOption.getNameEn(),
-                propertyTypeOption.getNameFr(),
+                propertyTypeOption.getName(),
                 propertyTypeOption.getDescription(),
                 propertyTypeOption.getCreatedAt());
     }
 
     // Embarque dans PropertyResponse.propertyType : voir OptionRef.
     public OptionRef toRef() {
-        return new OptionRef(id, nameEn, nameFr);
+        return new OptionRef(id, name);
     }
 }

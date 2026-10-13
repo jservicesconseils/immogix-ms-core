@@ -10,8 +10,7 @@ import java.util.UUID;
 public record ApartmentTypeResponse(
         UUID id,
         UUID organizationId,
-        String nameEn,
-        String nameFr,
+        String name,
         String description,
         Instant createdAt
 ) {
@@ -20,14 +19,13 @@ public record ApartmentTypeResponse(
         return new ApartmentTypeResponse(
                 apartmentType.getId(),
                 apartmentType.getOrganizationId(),
-                apartmentType.getNameEn(),
-                apartmentType.getNameFr(),
+                apartmentType.getName(),
                 apartmentType.getDescription(),
                 apartmentType.getCreatedAt());
     }
 
     // Embarque dans UnitResponse.apartmentType : voir OptionRef.
     public OptionRef toRef() {
-        return new OptionRef(id, nameEn, nameFr);
+        return new OptionRef(id, name);
     }
 }

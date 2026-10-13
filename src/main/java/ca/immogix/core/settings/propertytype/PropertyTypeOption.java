@@ -14,7 +14,7 @@ import java.util.UUID;
  * "Commercial"), gere dans Parametres et reference par Property.propertyTypeId.
  * Nomme "Option" pour ne pas entrer en collision avec l'ancien enum Java
  * ca.immogix.core.property.PropertyType (retire au profit de cette liste
- * configurable). Le nom est bilingue (nameEn/nameFr).
+ * configurable). Un seul nom par entree -- voir ApartmentType.
  */
 @Entity
 @Table(name = "property_type_options")
@@ -27,11 +27,8 @@ public class PropertyTypeOption {
     @Column(name = "organization_id", nullable = false)
     private UUID organizationId;
 
-    @Column(name = "name_en", nullable = false, length = 100)
-    private String nameEn;
-
-    @Column(name = "name_fr", nullable = false, length = 100)
-    private String nameFr;
+    @Column(nullable = false, length = 100)
+    private String name;
 
     @Column(length = 300)
     private String description;
@@ -43,17 +40,15 @@ public class PropertyTypeOption {
         // constructeur requis par JPA, ne pas utiliser directement
     }
 
-    public PropertyTypeOption(UUID organizationId, String nameEn, String nameFr, String description) {
+    public PropertyTypeOption(UUID organizationId, String name, String description) {
         this.organizationId = organizationId;
-        this.nameEn = nameEn;
-        this.nameFr = nameFr;
+        this.name = name;
         this.description = description;
         this.createdAt = Instant.now();
     }
 
-    public void update(String nameEn, String nameFr, String description) {
-        this.nameEn = nameEn;
-        this.nameFr = nameFr;
+    public void update(String name, String description) {
+        this.name = name;
         this.description = description;
     }
 
@@ -65,12 +60,8 @@ public class PropertyTypeOption {
         return organizationId;
     }
 
-    public String getNameEn() {
-        return nameEn;
-    }
-
-    public String getNameFr() {
-        return nameFr;
+    public String getName() {
+        return name;
     }
 
     public String getDescription() {

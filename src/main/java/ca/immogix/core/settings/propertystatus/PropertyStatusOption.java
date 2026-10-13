@@ -14,10 +14,10 @@ import java.util.UUID;
  * renovation", "Vendu"), gere dans Parametres et reference par
  * Property.propertyStatusId. Nomme "Option" pour ne pas entrer en
  * collision avec l'ancien enum Java ca.immogix.core.property.PropertyStatus
- * (retire au profit de cette liste configurable). Le nom est bilingue
- * (nameEn/nameFr). severity pilote la couleur du badge affiche cote
- * client (PrimeNG p-tag : success/warn/danger/secondary/info), puisque
- * l'ancien enum fixe ne peut plus servir de cle pour cette palette.
+ * (retire au profit de cette liste configurable). Un seul nom par
+ * entree -- voir ApartmentType. severity pilote la couleur du badge
+ * affiche cote client (PrimeNG p-tag : success/warn/danger/secondary/info),
+ * puisque l'ancien enum fixe ne peut plus servir de cle pour cette palette.
  */
 @Entity
 @Table(name = "property_status_options")
@@ -30,11 +30,8 @@ public class PropertyStatusOption {
     @Column(name = "organization_id", nullable = false)
     private UUID organizationId;
 
-    @Column(name = "name_en", nullable = false, length = 100)
-    private String nameEn;
-
-    @Column(name = "name_fr", nullable = false, length = 100)
-    private String nameFr;
+    @Column(nullable = false, length = 100)
+    private String name;
 
     @Column(length = 300)
     private String description;
@@ -49,18 +46,16 @@ public class PropertyStatusOption {
         // constructeur requis par JPA, ne pas utiliser directement
     }
 
-    public PropertyStatusOption(UUID organizationId, String nameEn, String nameFr, String description, String severity) {
+    public PropertyStatusOption(UUID organizationId, String name, String description, String severity) {
         this.organizationId = organizationId;
-        this.nameEn = nameEn;
-        this.nameFr = nameFr;
+        this.name = name;
         this.description = description;
         this.severity = severity;
         this.createdAt = Instant.now();
     }
 
-    public void update(String nameEn, String nameFr, String description, String severity) {
-        this.nameEn = nameEn;
-        this.nameFr = nameFr;
+    public void update(String name, String description, String severity) {
+        this.name = name;
         this.description = description;
         this.severity = severity;
     }
@@ -73,12 +68,8 @@ public class PropertyStatusOption {
         return organizationId;
     }
 
-    public String getNameEn() {
-        return nameEn;
-    }
-
-    public String getNameFr() {
-        return nameFr;
+    public String getName() {
+        return name;
     }
 
     public String getDescription() {

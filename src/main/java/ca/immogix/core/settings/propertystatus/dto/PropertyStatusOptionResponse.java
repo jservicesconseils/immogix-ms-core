@@ -9,8 +9,7 @@ import java.util.UUID;
 public record PropertyStatusOptionResponse(
         UUID id,
         UUID organizationId,
-        String nameEn,
-        String nameFr,
+        String name,
         String description,
         String severity,
         Instant createdAt
@@ -20,20 +19,19 @@ public record PropertyStatusOptionResponse(
         return new PropertyStatusOptionResponse(
                 propertyStatusOption.getId(),
                 propertyStatusOption.getOrganizationId(),
-                propertyStatusOption.getNameEn(),
-                propertyStatusOption.getNameFr(),
+                propertyStatusOption.getName(),
                 propertyStatusOption.getDescription(),
                 propertyStatusOption.getSeverity(),
                 propertyStatusOption.getCreatedAt());
     }
 
-    // Embarque dans PropertyResponse.propertyStatus : etend OptionRef
-    // avec severity pour que le badge colore se construise sans appel
+    // Embarque dans PropertyResponse.propertyStatus : etend le nom avec
+    // severity pour que le badge colore se construise sans appel
     // supplementaire cote client.
     public PropertyStatusRef toRef() {
-        return new PropertyStatusRef(id, nameEn, nameFr, severity);
+        return new PropertyStatusRef(id, name, severity);
     }
 
-    public record PropertyStatusRef(UUID id, String nameEn, String nameFr, String severity) {
+    public record PropertyStatusRef(UUID id, String name, String severity) {
     }
 }

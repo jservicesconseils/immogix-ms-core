@@ -76,9 +76,9 @@ class PropertyControllerTest {
     }
 
     private static PropertyResponse response(UUID id, UUID organizationId) {
-        return new PropertyResponse(id, organizationId, new OptionRef(UUID.randomUUID(), "Single-family home", "Maison individuelle"), null,
+        return new PropertyResponse(id, organizationId, new OptionRef(UUID.randomUUID(), "Maison individuelle"), null,
                 "123 rue des Lilas", "Montreal", "QC", "H1A 1A1",
-                new PropertyStatusOptionResponse.PropertyStatusRef(UUID.randomUUID(), "Vacant", "Vacante", "warn"),
+                new PropertyStatusOptionResponse.PropertyStatusRef(UUID.randomUUID(), "Vacante", "warn"),
                 null, null, null, null, null, null, null, null, Instant.now());
     }
 
@@ -322,7 +322,7 @@ class PropertyControllerTest {
         UUID propertyId = UUID.randomUUID();
         UUID unitId = UUID.randomUUID();
         when(unitService.getListing(propertyId, unitId)).thenReturn(new UnitListingResponse(
-                propertyId, unitId, "101", new OptionRef(UUID.randomUUID(), "2 Bedrooms", "2 chambres"), 2, 1, 85.0, new BigDecimal("1250.00"),
+                propertyId, unitId, "101", new OptionRef(UUID.randomUUID(), "2 chambres"), 2, 1, 85.0, new BigDecimal("1250.00"),
                 "123 Rue Principale", "Montreal", "QC", UnitStatus.DISPONIBLE));
 
         mockMvc.perform(get("/api/v1/properties/{propertyId}/units/{unitId}/listing", propertyId, unitId))

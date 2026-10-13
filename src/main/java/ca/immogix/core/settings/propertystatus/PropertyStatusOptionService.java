@@ -18,16 +18,6 @@ import java.util.UUID;
 @Service
 public class PropertyStatusOptionService {
 
-    // Catalogue de depart insere pour une organisation qui n'a encore
-    // aucun statut de propriete -- reprend les valeurs (et couleurs) de
-    // l'ancien enum PropertyStatus pour que la migration soit transparente.
-    private static final List<String[]> DEFAULT_CATALOG = List.of(
-            new String[] {"Vacant", "Vacante", "warn"},
-            new String[] {"Active", "Actif", "success"},
-            new String[] {"Under renovation", "En rénovation", "warn"},
-            new String[] {"Off market", "Hors marché", "secondary"},
-            new String[] {"Archived", "Archivée", "secondary"});
-
     private final PropertyStatusOptionRepository propertyStatusOptionRepository;
     private final PropertyRepository propertyRepository;
 
@@ -37,8 +27,8 @@ public class PropertyStatusOptionService {
     }
 
     public PropertyStatusOptionResponse create(CreatePropertyStatusOptionRequest request) {
-        PropertyStatusOption saved = propertyStatusOptionRepository.save(new PropertyStatusOption(
-                request.organizationId(), request.nameEn(), request.nameFr(), request.description(), request.severity()));
+        PropertyStatusOption saved = propertyStatusOptionRepository.save(
+                new PropertyStatusOption(request.organizationId(), request.name(), request.description(), request.severity()));
         return PropertyStatusOptionResponse.from(saved);
     }
 
@@ -47,16 +37,14 @@ public class PropertyStatusOptionService {
     }
 
     public List<PropertyStatusOptionResponse> listByOrganization(UUID organizationId) {
-        List<PropertyStatusOption> existing = propertyStatusOptionRepository.findByOrganizationIdOrderByNameEnAsc(organizationId);
-        if (existing.isEmpty()) {
-            existing = seedDefaults(organizationId);
-        }
-        return existing.stream().map(PropertyStatusOptionResponse::from).toList();
+        return propertyStatusOptionRepository.findByOrganizationIdOrderByNameAsc(organizationId).stream()
+                .map(PropertyStatusOptionResponse::from)
+                .toList();
     }
 
     public PropertyStatusOptionResponse update(UUID id, UpdatePropertyStatusOptionRequest request) {
         PropertyStatusOption propertyStatusOption = getEntityById(id);
-        propertyStatusOption.update(request.nameEn(), request.nameFr(), request.description(), request.severity());
+        propertyStatusOption.update(request.name(), request.description(), request.severity());
         return PropertyStatusOptionResponse.from(propertyStatusOptionRepository.save(propertyStatusOption));
     }
 
@@ -70,12 +58,5 @@ public class PropertyStatusOptionService {
     public PropertyStatusOption getEntityById(UUID id) {
         return propertyStatusOptionRepository.findById(id)
                 .orElseThrow(() -> new SettingsItemNotFoundException("statut de propriete", id));
-    }
-
-    private List<PropertyStatusOption> seedDefaults(UUID organizationId) {
-        List<PropertyStatusOption> seeded = DEFAULT_CATALOG.stream()
-                .map(triplet -> new PropertyStatusOption(organizationId, triplet[0], triplet[1], null, triplet[2]))
-                .toList();
-        return propertyStatusOptionRepository.saveAll(seeded);
     }
 }
