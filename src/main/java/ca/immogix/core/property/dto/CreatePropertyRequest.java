@@ -1,7 +1,6 @@
 package ca.immogix.core.property.dto;
 
 import ca.immogix.core.property.BuildingStatus;
-import ca.immogix.core.property.PropertyType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -15,8 +14,10 @@ public record CreatePropertyRequest(
         @NotNull(message = "l'organisation est requise")
         UUID organizationId,
 
+        // Reference ca.immogix.core.settings.propertytype.PropertyTypeOption
+        // (liste configurable dans Parametres), pas l'ancien enum PropertyType.
         @NotNull(message = "le type de propriete est requis")
-        PropertyType type,
+        UUID propertyTypeId,
 
         @Size(max = 200, message = "le nom ne doit pas depasser 200 caracteres")
         String name,
@@ -36,6 +37,12 @@ public record CreatePropertyRequest(
         @NotBlank(message = "le code postal est requis")
         @Size(max = 10, message = "le code postal ne doit pas depasser 10 caracteres")
         String postalCode,
+
+        // Reference ca.immogix.core.settings.propertystatus.PropertyStatusOption,
+        // pas l'ancien enum PropertyStatus (qui defaultait silencieusement a
+        // VACANTE -- desormais explicite, comme propertyTypeId).
+        @NotNull(message = "le statut de propriete est requis")
+        UUID propertyStatusId,
 
         // Champs optionnels -- supplementaires par rapport au MVP initial,
         // voir Property pour la justification de leur caractere facultatif.

@@ -49,11 +49,11 @@ class PropertyTypeOptionControllerTest {
     private JwtDecoder jwtDecoder;
 
     private static CreatePropertyTypeOptionRequest createRequest(UUID organizationId) {
-        return new CreatePropertyTypeOptionRequest(organizationId, "Residentiel", "Immeubles d'habitation");
+        return new CreatePropertyTypeOptionRequest(organizationId, "Residential", "Residentiel", "Immeubles d'habitation");
     }
 
     private static PropertyTypeOptionResponse response(UUID id, UUID organizationId) {
-        return new PropertyTypeOptionResponse(id, organizationId, "Residentiel", "Immeubles d'habitation", Instant.now());
+        return new PropertyTypeOptionResponse(id, organizationId, "Residential", "Residentiel", "Immeubles d'habitation", Instant.now());
     }
 
     @Test
@@ -68,7 +68,7 @@ class PropertyTypeOptionControllerTest {
                         .content(objectMapper.writeValueAsString(createRequest(organizationId))))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/v1/property-types/" + id))
-                .andExpect(jsonPath("$.name").value("Residentiel"));
+                .andExpect(jsonPath("$.nameFr").value("Residentiel"));
     }
 
     @Test
@@ -94,7 +94,7 @@ class PropertyTypeOptionControllerTest {
     @Test
     void creerUnTypeDePropriete_nomVide_renvoie400() throws Exception {
         UUID organizationId = UUID.randomUUID();
-        CreatePropertyTypeOptionRequest invalide = new CreatePropertyTypeOptionRequest(organizationId, "", null);
+        CreatePropertyTypeOptionRequest invalide = new CreatePropertyTypeOptionRequest(organizationId, "", "", null);
 
         mockMvc.perform(post("/api/v1/property-types")
                         .with(jwt().jwt(builder -> builder.claim("tenant_id", organizationId.toString())))
@@ -146,7 +146,7 @@ class PropertyTypeOptionControllerTest {
                         .param("organizationId", organizationId.toString())
                         .with(jwt().jwt(builder -> builder.claim("tenant_id", organizationId.toString()))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Residentiel"));
+                .andExpect(jsonPath("$[0].nameFr").value("Residentiel"));
     }
 
     @Test
@@ -167,7 +167,7 @@ class PropertyTypeOptionControllerTest {
         when(propertyTypeOptionService.getById(id)).thenReturn(response(id, organizationId));
         when(propertyTypeOptionService.update(eq(id), any())).thenReturn(response(id, organizationId));
 
-        UpdatePropertyTypeOptionRequest request = new UpdatePropertyTypeOptionRequest("Commercial", "Locaux commerciaux");
+        UpdatePropertyTypeOptionRequest request = new UpdatePropertyTypeOptionRequest("Commercial", "Commercial", "Locaux commerciaux");
 
         mockMvc.perform(put("/api/v1/property-types/{id}", id)
                         .with(jwt().jwt(builder -> builder.claim("tenant_id", organizationId.toString())))
@@ -184,7 +184,7 @@ class PropertyTypeOptionControllerTest {
         UUID id = UUID.randomUUID();
         when(propertyTypeOptionService.getById(id)).thenReturn(response(id, organizationId));
 
-        UpdatePropertyTypeOptionRequest request = new UpdatePropertyTypeOptionRequest("Commercial", "Locaux commerciaux");
+        UpdatePropertyTypeOptionRequest request = new UpdatePropertyTypeOptionRequest("Commercial", "Commercial", "Locaux commerciaux");
 
         mockMvc.perform(put("/api/v1/property-types/{id}", id)
                         .with(jwt().jwt(builder -> builder.claim("tenant_id", autreTenant.toString())))

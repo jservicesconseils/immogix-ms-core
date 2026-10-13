@@ -1,12 +1,12 @@
 package ca.immogix.core.property.dto;
 
-import ca.immogix.core.property.UnitType;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 /**
  * Ce que le client envoie pour modifier une unite existante. Ne touche
@@ -29,7 +29,7 @@ public record UpdateUnitRequest(
         @Min(value = 0, message = "le nombre de salles de bain ne peut pas etre negatif")
         Integer bathrooms,
 
-        UnitType type,
+        UUID apartmentTypeId,
 
         @Size(max = 2000, message = "la description ne doit pas depasser 2000 caracteres")
         String description,

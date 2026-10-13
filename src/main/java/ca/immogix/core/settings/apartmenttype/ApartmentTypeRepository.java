@@ -7,5 +7,5 @@ import java.util.UUID;
 
 public interface ApartmentTypeRepository extends JpaRepository<ApartmentType, UUID> {
 
-    List<ApartmentType> findByOrganizationIdOrderByNameAsc(UUID organizationId);
+    List<ApartmentType> findByOrganizationIdOrderByNameEnAsc(UUID organizationId);
 }

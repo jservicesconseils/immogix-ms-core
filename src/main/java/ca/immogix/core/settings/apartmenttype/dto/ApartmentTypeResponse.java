@@ -1,6 +1,7 @@
 package ca.immogix.core.settings.apartmenttype.dto;
 
 import ca.immogix.core.settings.apartmenttype.ApartmentType;
+import ca.immogix.core.settings.dto.OptionRef;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -9,7 +10,8 @@ import java.util.UUID;
 public record ApartmentTypeResponse(
         UUID id,
         UUID organizationId,
-        String name,
+        String nameEn,
+        String nameFr,
         String description,
         Instant createdAt
 ) {
@@ -18,8 +20,14 @@ public record ApartmentTypeResponse(
         return new ApartmentTypeResponse(
                 apartmentType.getId(),
                 apartmentType.getOrganizationId(),
-                apartmentType.getName(),
+                apartmentType.getNameEn(),
+                apartmentType.getNameFr(),
                 apartmentType.getDescription(),
                 apartmentType.getCreatedAt());
+    }
+
+    // Embarque dans UnitResponse.apartmentType : voir OptionRef.
+    public OptionRef toRef() {
+        return new OptionRef(id, nameEn, nameFr);
     }
 }

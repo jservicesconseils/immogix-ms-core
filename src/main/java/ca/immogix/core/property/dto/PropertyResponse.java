@@ -2,24 +2,31 @@ package ca.immogix.core.property.dto;
 
 import ca.immogix.core.property.BuildingStatus;
 import ca.immogix.core.property.Property;
-import ca.immogix.core.property.PropertyStatus;
-import ca.immogix.core.property.PropertyType;
+import ca.immogix.core.settings.dto.OptionRef;
+import ca.immogix.core.settings.propertystatus.dto.PropertyStatusOptionResponse.PropertyStatusRef;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
-/** Ce que l'API renvoie au client apres creation (ou lecture) d'une propriete. */
+/**
+ * Ce que l'API renvoie au client apres creation (ou lecture) d'une
+ * propriete. propertyType/propertyStatus sont resolus par PropertyService
+ * (appel a PropertyTypeOptionService/PropertyStatusOptionService) et
+ * embarques directement ici -- le client n'a pas besoin d'un aller-retour
+ * supplementaire pour afficher le nom (nameEn/nameFr) ou la couleur du
+ * badge de statut.
+ */
 public record PropertyResponse(
         UUID id,
         UUID organizationId,
-        PropertyType type,
+        OptionRef propertyType,
         String name,
         String street,
         String city,
         String province,
         String postalCode,
-        PropertyStatus status,
+        PropertyStatusRef propertyStatus,
         String cadastreNumber,
         String taxId,
         BuildingStatus buildingStatus,
@@ -31,17 +38,17 @@ public record PropertyResponse(
         Instant createdAt
 ) {
 
-    public static PropertyResponse from(Property property) {
+    public static PropertyResponse from(Property property, OptionRef propertyType, PropertyStatusRef propertyStatus) {
         return new PropertyResponse(
                 property.getId(),
                 property.getOrganizationId(),
-                property.getType(),
+                propertyType,
                 property.getName(),
                 property.getStreet(),
                 property.getCity(),
                 property.getProvince(),
                 property.getPostalCode(),
-                property.getStatus(),
+                propertyStatus,
                 property.getCadastreNumber(),
                 property.getTaxId(),
                 property.getBuildingStatus(),

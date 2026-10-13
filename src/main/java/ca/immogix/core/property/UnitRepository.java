@@ -16,4 +16,8 @@ public interface UnitRepository extends JpaRepository<Unit, UUID> {
 
     @Query("SELECT COUNT(u) FROM Unit u WHERE u.property.organizationId = :organizationId AND u.status = :status")
     long countByOrganizationIdAndStatus(UUID organizationId, UnitStatus status);
+
+    // Utilise par ApartmentTypeService pour empecher la suppression d'un
+    // type encore reference par une unite (voir SettingsItemInUseException).
+    boolean existsByApartmentTypeId(UUID apartmentTypeId);
 }

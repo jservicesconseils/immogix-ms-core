@@ -1,12 +1,12 @@
 package ca.immogix.core.property.dto;
 
 import ca.immogix.core.property.BuildingStatus;
-import ca.immogix.core.property.PropertyType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 /**
  * Ce que le client envoie pour modifier une propriete existante. Memes
@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 public record UpdatePropertyRequest(
 
         @NotNull(message = "le type de propriete est requis")
-        PropertyType type,
+        UUID propertyTypeId,
 
         @Size(max = 200, message = "le nom ne doit pas depasser 200 caracteres")
         String name,
@@ -36,6 +36,9 @@ public record UpdatePropertyRequest(
         @NotBlank(message = "le code postal est requis")
         @Size(max = 10, message = "le code postal ne doit pas depasser 10 caracteres")
         String postalCode,
+
+        @NotNull(message = "le statut de propriete est requis")
+        UUID propertyStatusId,
 
         @Size(max = 50, message = "le numero de cadastre ne doit pas depasser 50 caracteres")
         String cadastreNumber,

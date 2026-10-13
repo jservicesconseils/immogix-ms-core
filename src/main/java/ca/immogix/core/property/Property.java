@@ -26,6 +26,13 @@ import java.util.UUID;
  * organizationId n'est PAS une relation JPA vers une table Organization :
  * cette donnee vit dans immogix-ms-identity, un autre service/base. On
  * stocke uniquement l'identifiant du tenant, comme decrit dans son README.
+ *
+ * propertyTypeId/propertyStatusId referencent ca.immogix.core.settings
+ * (PropertyTypeOption/PropertyStatusOption) : des listes configurables
+ * par organisation dans Parametres, plutot que les anciens enums Java
+ * fixes PropertyType/PropertyStatus. Stockes comme simples UUID (pas de
+ * relation JPA) et resolus par PropertyService au besoin, meme logique
+ * que organizationId.
  */
 @Entity
 @Table(name = "properties")
@@ -38,9 +45,8 @@ public class Property {
     @Column(name = "organization_id", nullable = false)
     private UUID organizationId;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 40)
-    private PropertyType type;
+    @Column(name = "property_type_id", nullable = false)
+    private UUID propertyTypeId;
 
     // Nom usuel de la propriete (ex. "Le Domaine du Parc"), distinct de son
     // adresse -- purement cosmetique, affiche dans la liste/fiche quand
@@ -64,9 +70,8 @@ public class Property {
     @Column(name = "postal_code", nullable = false, length = 10)
     private String postalCode;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
-    private PropertyStatus status;
+    @Column(name = "property_status_id", nullable = false)
+    private UUID propertyStatusId;
 
     // Champs legaux/financiers optionnels -- tous nullable : la plupart des
     // utilisateurs ne les connaitront pas des la creation d'une propriete,
@@ -105,16 +110,17 @@ public class Property {
         // constructeur requis par JPA, ne pas utiliser directement
     }
 
-    public Property(UUID organizationId, PropertyType type, String name, String street, String city, String province, String postalCode,
-                     String cadastreNumber, String taxId, BuildingStatus buildingStatus, Integer yearBuilt,
-                     Integer floorCount, Double totalSurfaceArea, BigDecimal estimatedValue, String description) {
+    public Property(UUID organizationId, UUID propertyTypeId, String name, String street, String city, String province,
+                     String postalCode, UUID propertyStatusId, String cadastreNumber, String taxId, BuildingStatus buildingStatus,
+                     Integer yearBuilt, Integer floorCount, Double totalSurfaceArea, BigDecimal estimatedValue, String description) {
         this.organizationId = organizationId;
-        this.type = type;
+        this.propertyTypeId = propertyTypeId;
         this.name = name;
         this.street = street;
         this.city = city;
         this.province = province;
         this.postalCode = postalCode;
+        this.propertyStatusId = propertyStatusId;
         this.cadastreNumber = cadastreNumber;
         this.taxId = taxId;
         this.buildingStatus = buildingStatus;
@@ -123,7 +129,6 @@ public class Property {
         this.totalSurfaceArea = totalSurfaceArea;
         this.estimatedValue = estimatedValue;
         this.description = description;
-        this.status = PropertyStatus.VACANTE;
         this.createdAt = Instant.now();
     }
 
@@ -135,8 +140,8 @@ public class Property {
         return organizationId;
     }
 
-    public PropertyType getType() {
-        return type;
+    public UUID getPropertyTypeId() {
+        return propertyTypeId;
     }
 
     public String getName() {
@@ -159,8 +164,8 @@ public class Property {
         return postalCode;
     }
 
-    public PropertyStatus getStatus() {
-        return status;
+    public UUID getPropertyStatusId() {
+        return propertyStatusId;
     }
 
     public String getCadastreNumber() {
@@ -202,15 +207,16 @@ public class Property {
     // Mutateurs ajoutes pour l'edition d'une propriete (ecran "Modifier la
     // propriete" de la maquette) -- la creation initiale continue de passer
     // par le constructeur, ces setters ne servent qu'a PropertyService#update.
-    public void update(PropertyType type, String name, String street, String city, String province, String postalCode,
-                        String cadastreNumber, String taxId, BuildingStatus buildingStatus, Integer yearBuilt,
+    public void update(UUID propertyTypeId, String name, String street, String city, String province, String postalCode,
+                        UUID propertyStatusId, String cadastreNumber, String taxId, BuildingStatus buildingStatus, Integer yearBuilt,
                         Integer floorCount, Double totalSurfaceArea, BigDecimal estimatedValue, String description) {
-        this.type = type;
+        this.propertyTypeId = propertyTypeId;
         this.name = name;
         this.street = street;
         this.city = city;
         this.province = province;
         this.postalCode = postalCode;
+        this.propertyStatusId = propertyStatusId;
         this.cadastreNumber = cadastreNumber;
         this.taxId = taxId;
         this.buildingStatus = buildingStatus;

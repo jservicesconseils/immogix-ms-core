@@ -2,7 +2,7 @@ package ca.immogix.core.property.dto;
 
 import ca.immogix.core.property.Unit;
 import ca.immogix.core.property.UnitStatus;
-import ca.immogix.core.property.UnitType;
+import ca.immogix.core.settings.dto.OptionRef;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -18,7 +18,7 @@ public record UnitResponse(
         Double areaSquareMeters,
         Integer bedrooms,
         Integer bathrooms,
-        UnitType type,
+        OptionRef apartmentType,
         String description,
         BigDecimal listedRent,
         BigDecimal listedSecurityDeposit,
@@ -26,7 +26,9 @@ public record UnitResponse(
         Instant createdAt
 ) {
 
-    public static UnitResponse from(Unit unit) {
+    // apartmentType est deja resolu par UnitService (null si
+    // unit.getApartmentTypeId() est null -- le type est optionnel).
+    public static UnitResponse from(Unit unit, OptionRef apartmentType) {
         return new UnitResponse(
                 unit.getId(),
                 unit.getProperty().getId(),
@@ -36,7 +38,7 @@ public record UnitResponse(
                 unit.getAreaSquareMeters(),
                 unit.getBedrooms(),
                 unit.getBathrooms(),
-                unit.getType(),
+                apartmentType,
                 unit.getDescription(),
                 unit.getListedRent(),
                 unit.getListedSecurityDeposit(),

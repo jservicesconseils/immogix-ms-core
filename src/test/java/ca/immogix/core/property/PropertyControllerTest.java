@@ -8,6 +8,8 @@ import ca.immogix.core.property.dto.UnitResponse;
 import ca.immogix.core.property.dto.UpdatePropertyRequest;
 import ca.immogix.core.property.dto.UpdateUnitRequest;
 import ca.immogix.core.security.SecurityConfig;
+import ca.immogix.core.settings.dto.OptionRef;
+import ca.immogix.core.settings.propertystatus.dto.PropertyStatusOptionResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,14 +70,15 @@ class PropertyControllerTest {
     private JwtDecoder jwtDecoder;
 
     private static CreatePropertyRequest createRequest(UUID organizationId) {
-        return new CreatePropertyRequest(organizationId, PropertyType.MAISON_INDIVIDUELLE, null,
-                "123 rue des Lilas", "Montreal", "QC", "H1A 1A1",
+        return new CreatePropertyRequest(organizationId, UUID.randomUUID(), null,
+                "123 rue des Lilas", "Montreal", "QC", "H1A 1A1", UUID.randomUUID(),
                 null, null, null, null, null, null, null, null);
     }
 
     private static PropertyResponse response(UUID id, UUID organizationId) {
-        return new PropertyResponse(id, organizationId, PropertyType.MAISON_INDIVIDUELLE, null,
-                "123 rue des Lilas", "Montreal", "QC", "H1A 1A1", PropertyStatus.VACANTE,
+        return new PropertyResponse(id, organizationId, new OptionRef(UUID.randomUUID(), "Single-family home", "Maison individuelle"), null,
+                "123 rue des Lilas", "Montreal", "QC", "H1A 1A1",
+                new PropertyStatusOptionResponse.PropertyStatusRef(UUID.randomUUID(), "Vacant", "Vacante", "warn"),
                 null, null, null, null, null, null, null, null, Instant.now());
     }
 
@@ -174,8 +177,8 @@ class PropertyControllerTest {
         when(propertyService.getById(propertyId)).thenReturn(response(propertyId, organizationId));
         when(propertyService.update(eq(propertyId), any())).thenReturn(response(propertyId, organizationId));
 
-        UpdatePropertyRequest request = new UpdatePropertyRequest(PropertyType.MAISON_INDIVIDUELLE, null,
-                "123 rue des Lilas", "Montreal", "QC", "H1A 1A1",
+        UpdatePropertyRequest request = new UpdatePropertyRequest(UUID.randomUUID(), null,
+                "123 rue des Lilas", "Montreal", "QC", "H1A 1A1", UUID.randomUUID(),
                 null, null, null, null, null, null, null, null);
 
         mockMvc.perform(put("/api/v1/properties/{id}", propertyId)
@@ -193,8 +196,8 @@ class PropertyControllerTest {
         UUID propertyId = UUID.randomUUID();
         when(propertyService.getById(propertyId)).thenReturn(response(propertyId, organizationId));
 
-        UpdatePropertyRequest request = new UpdatePropertyRequest(PropertyType.MAISON_INDIVIDUELLE, null,
-                "123 rue des Lilas", "Montreal", "QC", "H1A 1A1",
+        UpdatePropertyRequest request = new UpdatePropertyRequest(UUID.randomUUID(), null,
+                "123 rue des Lilas", "Montreal", "QC", "H1A 1A1", UUID.randomUUID(),
                 null, null, null, null, null, null, null, null);
 
         mockMvc.perform(put("/api/v1/properties/{id}", propertyId)
@@ -319,7 +322,7 @@ class PropertyControllerTest {
         UUID propertyId = UUID.randomUUID();
         UUID unitId = UUID.randomUUID();
         when(unitService.getListing(propertyId, unitId)).thenReturn(new UnitListingResponse(
-                propertyId, unitId, "101", UnitType.DEUX_CHAMBRES, 2, 1, 85.0, new BigDecimal("1250.00"),
+                propertyId, unitId, "101", new OptionRef(UUID.randomUUID(), "2 Bedrooms", "2 chambres"), 2, 1, 85.0, new BigDecimal("1250.00"),
                 "123 Rue Principale", "Montreal", "QC", UnitStatus.DISPONIBLE));
 
         mockMvc.perform(get("/api/v1/properties/{propertyId}/units/{unitId}/listing", propertyId, unitId))

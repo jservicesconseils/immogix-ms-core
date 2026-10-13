@@ -22,6 +22,11 @@ public class SettingsExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorBody(ex.getMessage()));
     }
 
+    @ExceptionHandler(SettingsItemInUseException.class)
+    public ResponseEntity<Map<String, Object>> handleInUse(SettingsItemInUseException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorBody(ex.getMessage()));
+    }
+
     private Map<String, Object> errorBody(String message) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", Instant.now().toString());

@@ -11,9 +11,10 @@ import java.util.UUID;
 
 /**
  * Type d'appartement configurable par organisation (ex. "3 1/2", "4 1/2",
- * "Studio"), gere dans Parametres. Independant de l'enum Java UnitType
- * utilise ailleurs, pour laisser chaque organisation definir son propre
- * vocabulaire sans toucher au code.
+ * "Studio"), gere dans Parametres et reference par Unit.apartmentTypeId.
+ * Le nom est bilingue (nameEn/nameFr) : l'application supporte l'anglais
+ * et le francais, et ces libelles sont affiches directement dans les
+ * selecteurs cote client selon la langue active.
  */
 @Entity
 @Table(name = "apartment_types")
@@ -26,8 +27,11 @@ public class ApartmentType {
     @Column(name = "organization_id", nullable = false)
     private UUID organizationId;
 
-    @Column(nullable = false, length = 100)
-    private String name;
+    @Column(name = "name_en", nullable = false, length = 100)
+    private String nameEn;
+
+    @Column(name = "name_fr", nullable = false, length = 100)
+    private String nameFr;
 
     @Column(length = 300)
     private String description;
@@ -39,9 +43,10 @@ public class ApartmentType {
         // constructeur requis par JPA, ne pas utiliser directement
     }
 
-    public ApartmentType(UUID organizationId, String name, String description) {
+    public ApartmentType(UUID organizationId, String nameEn, String nameFr, String description) {
         this.organizationId = organizationId;
-        this.name = name;
+        this.nameEn = nameEn;
+        this.nameFr = nameFr;
         this.description = description;
         this.createdAt = Instant.now();
     }
@@ -49,8 +54,9 @@ public class ApartmentType {
     // Pas de setters : seule cette methode permet de modifier l'entite
     // apres creation (voir ApartmentTypeService#update), meme convention
     // que Property.update().
-    public void update(String name, String description) {
-        this.name = name;
+    public void update(String nameEn, String nameFr, String description) {
+        this.nameEn = nameEn;
+        this.nameFr = nameFr;
         this.description = description;
     }
 
@@ -62,8 +68,12 @@ public class ApartmentType {
         return organizationId;
     }
 
-    public String getName() {
-        return name;
+    public String getNameEn() {
+        return nameEn;
+    }
+
+    public String getNameFr() {
+        return nameFr;
     }
 
     public String getDescription() {

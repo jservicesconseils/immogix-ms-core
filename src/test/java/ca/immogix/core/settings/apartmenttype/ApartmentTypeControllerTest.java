@@ -49,11 +49,11 @@ class ApartmentTypeControllerTest {
     private JwtDecoder jwtDecoder;
 
     private static CreateApartmentTypeRequest createRequest(UUID organizationId) {
-        return new CreateApartmentTypeRequest(organizationId, "3 1/2", "Deux chambres, un salon");
+        return new CreateApartmentTypeRequest(organizationId, "3.5", "3 1/2", "Deux chambres, un salon");
     }
 
     private static ApartmentTypeResponse response(UUID id, UUID organizationId) {
-        return new ApartmentTypeResponse(id, organizationId, "3 1/2", "Deux chambres, un salon", Instant.now());
+        return new ApartmentTypeResponse(id, organizationId, "3.5", "3 1/2", "Deux chambres, un salon", Instant.now());
     }
 
     @Test
@@ -68,7 +68,7 @@ class ApartmentTypeControllerTest {
                         .content(objectMapper.writeValueAsString(createRequest(organizationId))))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/api/v1/apartment-types/" + id))
-                .andExpect(jsonPath("$.name").value("3 1/2"));
+                .andExpect(jsonPath("$.nameFr").value("3 1/2"));
     }
 
     @Test
@@ -94,7 +94,7 @@ class ApartmentTypeControllerTest {
     @Test
     void creerUnTypeDAppartement_nomVide_renvoie400() throws Exception {
         UUID organizationId = UUID.randomUUID();
-        CreateApartmentTypeRequest invalide = new CreateApartmentTypeRequest(organizationId, "", null);
+        CreateApartmentTypeRequest invalide = new CreateApartmentTypeRequest(organizationId, "", "", null);
 
         mockMvc.perform(post("/api/v1/apartment-types")
                         .with(jwt().jwt(builder -> builder.claim("tenant_id", organizationId.toString())))
@@ -146,7 +146,7 @@ class ApartmentTypeControllerTest {
                         .param("organizationId", organizationId.toString())
                         .with(jwt().jwt(builder -> builder.claim("tenant_id", organizationId.toString()))))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("3 1/2"));
+                .andExpect(jsonPath("$[0].nameFr").value("3 1/2"));
     }
 
     @Test
@@ -167,7 +167,7 @@ class ApartmentTypeControllerTest {
         when(apartmentTypeService.getById(id)).thenReturn(response(id, organizationId));
         when(apartmentTypeService.update(eq(id), any())).thenReturn(response(id, organizationId));
 
-        UpdateApartmentTypeRequest request = new UpdateApartmentTypeRequest("4 1/2", "Trois chambres");
+        UpdateApartmentTypeRequest request = new UpdateApartmentTypeRequest("4.5", "4 1/2", "Trois chambres");
 
         mockMvc.perform(put("/api/v1/apartment-types/{id}", id)
                         .with(jwt().jwt(builder -> builder.claim("tenant_id", organizationId.toString())))
@@ -184,7 +184,7 @@ class ApartmentTypeControllerTest {
         UUID id = UUID.randomUUID();
         when(apartmentTypeService.getById(id)).thenReturn(response(id, organizationId));
 
-        UpdateApartmentTypeRequest request = new UpdateApartmentTypeRequest("4 1/2", "Trois chambres");
+        UpdateApartmentTypeRequest request = new UpdateApartmentTypeRequest("4.5", "4 1/2", "Trois chambres");
 
         mockMvc.perform(put("/api/v1/apartment-types/{id}", id)
                         .with(jwt().jwt(builder -> builder.claim("tenant_id", autreTenant.toString())))

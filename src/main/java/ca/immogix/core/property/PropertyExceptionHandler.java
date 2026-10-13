@@ -33,6 +33,11 @@ public class PropertyExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorBody(ex.getMessage()));
     }
 
+    @ExceptionHandler(ReferenceOrganizationMismatchException.class)
+    public ResponseEntity<Map<String, Object>> handleReferenceOrganizationMismatch(ReferenceOrganizationMismatchException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorBody(ex.getMessage()));
+    }
+
     private Map<String, Object> errorBody(String message) {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", Instant.now().toString());

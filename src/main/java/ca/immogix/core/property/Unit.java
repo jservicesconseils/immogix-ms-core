@@ -48,9 +48,11 @@ public class Unit {
 
     private Integer bathrooms;
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 30)
-    private UnitType type;
+    // Reference ca.immogix.core.settings.apartmenttype.ApartmentType (liste
+    // configurable par organisation dans Parametres), pas l'ancien enum Java
+    // UnitType -- simple UUID, meme logique que Property.propertyTypeId.
+    @Column(name = "apartment_type_id")
+    private UUID apartmentTypeId;
 
     @Column(length = 2000)
     private String description;
@@ -81,7 +83,7 @@ public class Unit {
 
     public Unit(Property property, String label, boolean principal, Integer floor,
                 Double areaSquareMeters, Integer bedrooms, Integer bathrooms,
-                UnitType type, String description, BigDecimal listedRent,
+                UUID apartmentTypeId, String description, BigDecimal listedRent,
                 BigDecimal listedSecurityDeposit, UnitStatus status) {
         this.property = property;
         this.label = label;
@@ -90,7 +92,7 @@ public class Unit {
         this.areaSquareMeters = areaSquareMeters;
         this.bedrooms = bedrooms;
         this.bathrooms = bathrooms;
-        this.type = type;
+        this.apartmentTypeId = apartmentTypeId;
         this.description = description;
         this.listedRent = listedRent;
         this.listedSecurityDeposit = listedSecurityDeposit;
@@ -103,13 +105,13 @@ public class Unit {
     // son propre cycle (markOccupied, baux) plutot que d'etre reecrit en
     // bloc depuis un formulaire.
     public void update(String label, Integer floor, Double areaSquareMeters, Integer bedrooms, Integer bathrooms,
-                        UnitType type, String description, BigDecimal listedRent, BigDecimal listedSecurityDeposit) {
+                        UUID apartmentTypeId, String description, BigDecimal listedRent, BigDecimal listedSecurityDeposit) {
         this.label = label;
         this.floor = floor;
         this.areaSquareMeters = areaSquareMeters;
         this.bedrooms = bedrooms;
         this.bathrooms = bathrooms;
-        this.type = type;
+        this.apartmentTypeId = apartmentTypeId;
         this.description = description;
         this.listedRent = listedRent;
         this.listedSecurityDeposit = listedSecurityDeposit;
@@ -152,8 +154,8 @@ public class Unit {
         return bathrooms;
     }
 
-    public UnitType getType() {
-        return type;
+    public UUID getApartmentTypeId() {
+        return apartmentTypeId;
     }
 
     public String getDescription() {

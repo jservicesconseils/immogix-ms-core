@@ -1,5 +1,6 @@
 package ca.immogix.core.settings.propertytype.dto;
 
+import ca.immogix.core.settings.dto.OptionRef;
 import ca.immogix.core.settings.propertytype.PropertyTypeOption;
 
 import java.time.Instant;
@@ -9,7 +10,8 @@ import java.util.UUID;
 public record PropertyTypeOptionResponse(
         UUID id,
         UUID organizationId,
-        String name,
+        String nameEn,
+        String nameFr,
         String description,
         Instant createdAt
 ) {
@@ -18,8 +20,14 @@ public record PropertyTypeOptionResponse(
         return new PropertyTypeOptionResponse(
                 propertyTypeOption.getId(),
                 propertyTypeOption.getOrganizationId(),
-                propertyTypeOption.getName(),
+                propertyTypeOption.getNameEn(),
+                propertyTypeOption.getNameFr(),
                 propertyTypeOption.getDescription(),
                 propertyTypeOption.getCreatedAt());
+    }
+
+    // Embarque dans PropertyResponse.propertyType : voir OptionRef.
+    public OptionRef toRef() {
+        return new OptionRef(id, nameEn, nameFr);
     }
 }

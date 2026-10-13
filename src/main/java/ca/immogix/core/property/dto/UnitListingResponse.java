@@ -2,7 +2,7 @@ package ca.immogix.core.property.dto;
 
 import ca.immogix.core.property.Unit;
 import ca.immogix.core.property.UnitStatus;
-import ca.immogix.core.property.UnitType;
+import ca.immogix.core.settings.dto.OptionRef;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -17,7 +17,7 @@ public record UnitListingResponse(
         UUID propertyId,
         UUID unitId,
         String unitLabel,
-        UnitType type,
+        OptionRef apartmentType,
         Integer bedrooms,
         Integer bathrooms,
         Double areaSquareMeters,
@@ -28,12 +28,12 @@ public record UnitListingResponse(
         UnitStatus status
 ) {
 
-    public static UnitListingResponse from(Unit unit) {
+    public static UnitListingResponse from(Unit unit, OptionRef apartmentType) {
         return new UnitListingResponse(
                 unit.getProperty().getId(),
                 unit.getId(),
                 unit.getLabel(),
-                unit.getType(),
+                apartmentType,
                 unit.getBedrooms(),
                 unit.getBathrooms(),
                 unit.getAreaSquareMeters(),

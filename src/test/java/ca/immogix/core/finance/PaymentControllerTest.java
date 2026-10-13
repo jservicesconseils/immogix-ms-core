@@ -4,9 +4,9 @@ import ca.immogix.core.finance.dto.CreatePaymentRequest;
 import ca.immogix.core.finance.dto.PaymentResponse;
 import ca.immogix.core.finance.dto.RecordPaymentRequest;
 import ca.immogix.core.property.PropertyService;
-import ca.immogix.core.property.PropertyStatus;
-import ca.immogix.core.property.PropertyType;
 import ca.immogix.core.property.dto.PropertyResponse;
+import ca.immogix.core.settings.dto.OptionRef;
+import ca.immogix.core.settings.propertystatus.dto.PropertyStatusOptionResponse;
 import ca.immogix.core.security.SecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -53,8 +53,9 @@ class PaymentControllerTest {
     private JwtDecoder jwtDecoder;
 
     private static PropertyResponse propertyResponse(UUID id, UUID organizationId) {
-        return new PropertyResponse(id, organizationId, PropertyType.MAISON_INDIVIDUELLE, null,
-                "123 rue des Lilas", "Montreal", "QC", "H1A 1A1", PropertyStatus.VACANTE,
+        return new PropertyResponse(id, organizationId, new OptionRef(UUID.randomUUID(), "Single-family home", "Maison individuelle"), null,
+                "123 rue des Lilas", "Montreal", "QC", "H1A 1A1",
+                new PropertyStatusOptionResponse.PropertyStatusRef(UUID.randomUUID(), "Vacant", "Vacante", "warn"),
                 null, null, null, null, null, null, null, null, Instant.now());
     }
 

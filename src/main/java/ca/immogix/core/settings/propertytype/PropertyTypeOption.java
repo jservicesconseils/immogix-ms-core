@@ -11,10 +11,10 @@ import java.util.UUID;
 
 /**
  * Type de propriete configurable par organisation (ex. "Residentiel",
- * "Commercial"), gere dans Parametres. Nomme "Option" pour ne pas entrer
- * en collision avec l'enum Java ca.immogix.core.property.PropertyType
- * utilise sur Property.type -- les deux coexistent independamment, cette
- * table alimente uniquement les ecrans de Parametres.
+ * "Commercial"), gere dans Parametres et reference par Property.propertyTypeId.
+ * Nomme "Option" pour ne pas entrer en collision avec l'ancien enum Java
+ * ca.immogix.core.property.PropertyType (retire au profit de cette liste
+ * configurable). Le nom est bilingue (nameEn/nameFr).
  */
 @Entity
 @Table(name = "property_type_options")
@@ -27,8 +27,11 @@ public class PropertyTypeOption {
     @Column(name = "organization_id", nullable = false)
     private UUID organizationId;
 
-    @Column(nullable = false, length = 100)
-    private String name;
+    @Column(name = "name_en", nullable = false, length = 100)
+    private String nameEn;
+
+    @Column(name = "name_fr", nullable = false, length = 100)
+    private String nameFr;
 
     @Column(length = 300)
     private String description;
@@ -40,15 +43,17 @@ public class PropertyTypeOption {
         // constructeur requis par JPA, ne pas utiliser directement
     }
 
-    public PropertyTypeOption(UUID organizationId, String name, String description) {
+    public PropertyTypeOption(UUID organizationId, String nameEn, String nameFr, String description) {
         this.organizationId = organizationId;
-        this.name = name;
+        this.nameEn = nameEn;
+        this.nameFr = nameFr;
         this.description = description;
         this.createdAt = Instant.now();
     }
 
-    public void update(String name, String description) {
-        this.name = name;
+    public void update(String nameEn, String nameFr, String description) {
+        this.nameEn = nameEn;
+        this.nameFr = nameFr;
         this.description = description;
     }
 
@@ -60,8 +65,12 @@ public class PropertyTypeOption {
         return organizationId;
     }
 
-    public String getName() {
-        return name;
+    public String getNameEn() {
+        return nameEn;
+    }
+
+    public String getNameFr() {
+        return nameFr;
     }
 
     public String getDescription() {

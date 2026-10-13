@@ -11,4 +11,11 @@ public interface PropertyRepository extends JpaRepository<Property, UUID> {
     long countByOrganizationId(UUID organizationId);
 
     List<Property> findByOrganizationId(UUID organizationId);
+
+    // Utilises par les services de ca.immogix.core.settings pour empecher
+    // la suppression d'un type/statut encore reference par une propriete
+    // (voir SettingsItemInUseException).
+    boolean existsByPropertyTypeId(UUID propertyTypeId);
+
+    boolean existsByPropertyStatusId(UUID propertyStatusId);
 }
